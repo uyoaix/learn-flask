@@ -20,9 +20,10 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 app.config['SECRET_KEY'] = 'You can do what?'
 app.config['SQLALCHEMY_DATABASE_URI']='mysql://root:xingchen@localhost/test'
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN']= True
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN']=True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
 
-db = SQLALCHEMY(app)
+db = SQLAlchemy(app)
 
 
 class NameForm(Form):

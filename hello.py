@@ -13,6 +13,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import Required
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Shell
+from flask.ext.migrate import Migrate, MigrateCommand
 
 app = Flask(__name__)
 manager = Manager(app)
@@ -24,6 +25,7 @@ app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 class NameForm(Form):
@@ -85,7 +87,10 @@ class User(db.Model):
 
 def make_shell_context():
     return dict(app=app, db=db, User=User, Role=Role)
+
+    
 manager.add_command('shell', Shell(make_context=make_shell_context))
+manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
     manager.run()

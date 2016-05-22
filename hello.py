@@ -12,6 +12,7 @@ from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.script import Shell
 
 app = Flask(__name__)
 manager = Manager(app)
@@ -34,9 +35,17 @@ class NameForm(Form):
 def index():
     form = NameForm()
     if form.validate_on_submit():
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data)
+            db.session.add(user)
+            session['known'] = True
+        else:
+            session['known'] = True
         session['name'] = form.name.data
-    return redirect(url_for('index'))
-    return render_template('index.html', form=form, name=session.get('name'))
+        form.name.data = ''
+        return redirect(url_for('index'))
+    return render_template('index.html', form=form, name=session.get('name'), known=session.get('known', False))
 
 
 @app.route("/user/<name>")
@@ -73,6 +82,10 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+
+def make_shell_context():
+    return dict(app=app, db=db, User=User, Role=Role)
+manager.add_command('shell', Shell(make_context=make_shell_context))
 
 if __name__ == '__main__':
     manager.run()

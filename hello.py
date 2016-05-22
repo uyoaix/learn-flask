@@ -30,7 +30,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # mail server
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True 
+app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
@@ -40,6 +40,7 @@ app.config['FLASKY_MAIL_SENDER'] = 'Flasky Admin <zi_mengling@yeah.net>'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 mail = Mail(app)
+
 
 class NameForm(Form):
     name = StringField('What is your name?', validators=[Required()])
@@ -77,8 +78,9 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
+
 def send_mail(to, subject, template, **kwargs):
-    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + subject,sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
+    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + subject, sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
     msg.body = render_template(template + '.txt', **kwargs)
     msg.html = render_template(template + '.html', **kwargs)
     mail.send(msg)
